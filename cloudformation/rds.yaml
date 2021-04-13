@@ -1,0 +1,65 @@
+# Set AWS template version
+AWSTemplateFormatVersion: "2010-09-09"
+# Set Parameters
+Parameters:
+  EngineVersion:
+    Description: PostgreSQL version.
+    Type: String
+    Default: 9.6.5
+  SubnetIds:
+    Description: Subnet ids for redis
+    Type: "List<AWS::EC2::Subnet::Id>"
+  VpcId:
+    Description: Insert your existing VPC id here
+    Type: String
+  CidrIp:
+    Description: Insert the VPC cidr range
+    Type: String
+
+Resources:
+  DBSubnetGroup:
+    Type: "AWS::RDS::DBSubnetGroup"
+    Properties:
+      DBSubnetGroupDescription: !Ref "AWS::StackName"
+      SubnetIds: !Ref SubnetIds
+
+  MyRDSInstanceSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: "This is my rds instance secret"
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "postgresadmin"}'
+        GenerateStringKey: "password"
+        PasswordLength: 16
+        ExcludeCharacters: '"@/\'
+      Tags:
+        - Key: copilot-environment
+          Value: test
+        - Key: copilot-application
+          Value: django-example-copilot
+
+  DBInstance:
+    Type: "AWS::RDS::DBInstance"
+    Properties:
+      AllocatedStorage: "20"
+      DBInstanceClass: "db.t2.micro"
+      DBName: "postgres"
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      Engine: postgres
+      EngineVersion: !Ref EngineVersion
+      MasterUsername: !Sub "{{resolve:secretsmanager:${MyRDSInstanceSecret}::username}}"
+      MasterUserPassword: !Sub "{{resolve:secretsmanager:${MyRDSInstanceSecret}::password}}"
+      StorageType: gp2
+      VPCSecurityGroups:
+        - !Ref DatabaseSecurityGroup
+
+  DatabaseSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: !Ref "AWS::StackName"
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: !Ref CidrIp

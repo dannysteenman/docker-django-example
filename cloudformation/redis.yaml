@@ -1,0 +1,48 @@
+# Set AWS template version
+AWSTemplateFormatVersion: "2010-09-09"
+# Set Parameters
+Parameters:
+  EngineVersion:
+    Description: Redis version
+    Type: String
+    Default: 6.x
+  CacheParameterGroupFamily:
+    Description: Parameter group family e.g. redis6.0
+    Type: String
+    Default: redis6.x
+  CacheNodeType:
+    Description: Node instance type
+    Type: String
+    Default: cache.t2.micro
+  SecurityGroupIds:
+    Description: Security group ids for redis
+    Type: "List<AWS::EC2::SecurityGroup::Id>"
+  SubnetIds:
+    Description: Subnet ids for redis
+    Type: "List<AWS::EC2::Subnet::Id>"
+
+Resources:
+  CacheSubnetGroupName:
+    Type: "AWS::ElastiCache::SubnetGroup"
+    Properties:
+      Description: !Sub "Subnet Group for ${AWS::StackName}"
+      SubnetIds: !Ref SubnetIds
+
+  CacheCluster:
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      CacheNodeType: !Ref CacheNodeType
+      CacheParameterGroupName: !Ref DBParameterGroupObject
+      CacheSubnetGroupName: !Ref CacheSubnetGroupName
+      Engine: redis
+      EngineVersion: !Ref EngineVersion
+      NumCacheNodes: 1
+      VpcSecurityGroupIds: !Ref SecurityGroupIds
+
+  DBParameterGroupObject:
+    Type: AWS::ElastiCache::ParameterGroup
+    Properties:
+      Description: "Parameter Group for REDIS instance"
+      CacheParameterGroupFamily: !Ref CacheParameterGroupFamily
+      Properties:
+        stream-node-max-bytes: "2048"
