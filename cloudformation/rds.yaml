@@ -7,14 +7,15 @@ Parameters:
     Type: String
     Default: 9.6.5
   SubnetIds:
-    Description: Subnet ids for redis
+    Description: Subnet ids for redis (when you use the vpc template in this repo, then use the 3x TheVPCdataSubnets)
     Type: "List<AWS::EC2::Subnet::Id>"
   VpcId:
     Description: Insert your existing VPC id here
     Type: String
   CidrIp:
-    Description: Insert the VPC cidr range
+    Description: Insert the VPC cidr range (when you use the vpc template you can leave the default)
     Type: String
+    Default: 172.20.16.0/20
 
 Resources:
   DBSubnetGroup:

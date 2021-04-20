@@ -1,0 +1,411 @@
+Resources:
+  TheVPC92636AB0:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 172.20.16.0/20
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      Tags:
+        - Key: Name
+          Value: VpcStack/TheVPC
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/Resource
+  TheVPCpublicSubnet1Subnet5D8658FE:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 172.20.16.0/24
+      VpcId:
+        Ref: TheVPC92636AB0
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: public
+        - Key: aws-cdk:subnet-type
+          Value: Public
+        - Key: Name
+          Value: VpcStack/TheVPC/publicSubnet1
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/publicSubnet1/Subnet
+  TheVPCpublicSubnet1RouteTable91D676B9:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: TheVPC92636AB0
+      Tags:
+        - Key: Name
+          Value: VpcStack/TheVPC/publicSubnet1
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/publicSubnet1/RouteTable
+  TheVPCpublicSubnet1RouteTableAssociation1CAA652F:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: TheVPCpublicSubnet1RouteTable91D676B9
+      SubnetId:
+        Ref: TheVPCpublicSubnet1Subnet5D8658FE
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/publicSubnet1/RouteTableAssociation
+  TheVPCpublicSubnet1DefaultRoute394125EB:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: TheVPCpublicSubnet1RouteTable91D676B9
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: TheVPCIGWFA25CC08
+    DependsOn:
+      - TheVPCVPCGWC9B93E30
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/publicSubnet1/DefaultRoute
+  TheVPCpublicSubnet1EIP7FA8AFE5:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: VpcStack/TheVPC/publicSubnet1
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/publicSubnet1/EIP
+  TheVPCpublicSubnet1NATGateway6622F681:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId:
+        Fn::GetAtt:
+          - TheVPCpublicSubnet1EIP7FA8AFE5
+          - AllocationId
+      SubnetId:
+        Ref: TheVPCpublicSubnet1Subnet5D8658FE
+      Tags:
+        - Key: Name
+          Value: VpcStack/TheVPC/publicSubnet1
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/publicSubnet1/NATGateway
+  TheVPCpublicSubnet2SubnetAF328120:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 172.20.17.0/24
+      VpcId:
+        Ref: TheVPC92636AB0
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: true
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: public
+        - Key: aws-cdk:subnet-type
+          Value: Public
+        - Key: Name
+          Value: VpcStack/TheVPC/publicSubnet2
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/publicSubnet2/Subnet
+  TheVPCpublicSubnet2RouteTable01F32CED:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: TheVPC92636AB0
+      Tags:
+        - Key: Name
+          Value: VpcStack/TheVPC/publicSubnet2
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/publicSubnet2/RouteTable
+  TheVPCpublicSubnet2RouteTableAssociation6CB67046:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: TheVPCpublicSubnet2RouteTable01F32CED
+      SubnetId:
+        Ref: TheVPCpublicSubnet2SubnetAF328120
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/publicSubnet2/RouteTableAssociation
+  TheVPCpublicSubnet2DefaultRouteD6F55DC2:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: TheVPCpublicSubnet2RouteTable01F32CED
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId:
+        Ref: TheVPCIGWFA25CC08
+    DependsOn:
+      - TheVPCVPCGWC9B93E30
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/publicSubnet2/DefaultRoute
+  TheVPCapplicationSubnet1Subnet2149DB21:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 172.20.18.0/24
+      VpcId:
+        Ref: TheVPC92636AB0
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: application
+        - Key: aws-cdk:subnet-type
+          Value: Private
+        - Key: Name
+          Value: VpcStack/TheVPC/applicationSubnet1
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/applicationSubnet1/Subnet
+  TheVPCapplicationSubnet1RouteTable0C50F734:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: TheVPC92636AB0
+      Tags:
+        - Key: Name
+          Value: VpcStack/TheVPC/applicationSubnet1
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/applicationSubnet1/RouteTable
+  TheVPCapplicationSubnet1RouteTableAssociationC56EF4FA:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: TheVPCapplicationSubnet1RouteTable0C50F734
+      SubnetId:
+        Ref: TheVPCapplicationSubnet1Subnet2149DB21
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/applicationSubnet1/RouteTableAssociation
+  TheVPCapplicationSubnet1DefaultRoute85977A65:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: TheVPCapplicationSubnet1RouteTable0C50F734
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: TheVPCpublicSubnet1NATGateway6622F681
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/applicationSubnet1/DefaultRoute
+  TheVPCapplicationSubnet2Subnet38670E3A:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 172.20.19.0/24
+      VpcId:
+        Ref: TheVPC92636AB0
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: application
+        - Key: aws-cdk:subnet-type
+          Value: Private
+        - Key: Name
+          Value: VpcStack/TheVPC/applicationSubnet2
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/applicationSubnet2/Subnet
+  TheVPCapplicationSubnet2RouteTable5BBAEB7F:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: TheVPC92636AB0
+      Tags:
+        - Key: Name
+          Value: VpcStack/TheVPC/applicationSubnet2
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/applicationSubnet2/RouteTable
+  TheVPCapplicationSubnet2RouteTableAssociation8D072598:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: TheVPCapplicationSubnet2RouteTable5BBAEB7F
+      SubnetId:
+        Ref: TheVPCapplicationSubnet2Subnet38670E3A
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/applicationSubnet2/RouteTableAssociation
+  TheVPCapplicationSubnet2DefaultRoute7BA86B85:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId:
+        Ref: TheVPCapplicationSubnet2RouteTable5BBAEB7F
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId:
+        Ref: TheVPCpublicSubnet1NATGateway6622F681
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/applicationSubnet2/DefaultRoute
+  TheVPCdataSubnet1Subnet62F6C85A:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 172.20.20.0/24
+      VpcId:
+        Ref: TheVPC92636AB0
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: data
+        - Key: aws-cdk:subnet-type
+          Value: Isolated
+        - Key: Name
+          Value: VpcStack/TheVPC/dataSubnet1
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/dataSubnet1/Subnet
+  TheVPCdataSubnet1RouteTableDA543B71:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: TheVPC92636AB0
+      Tags:
+        - Key: Name
+          Value: VpcStack/TheVPC/dataSubnet1
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/dataSubnet1/RouteTable
+  TheVPCdataSubnet1RouteTableAssociationBD633CD4:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: TheVPCdataSubnet1RouteTableDA543B71
+      SubnetId:
+        Ref: TheVPCdataSubnet1Subnet62F6C85A
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/dataSubnet1/RouteTableAssociation
+  TheVPCdataSubnet2SubnetAE4EF5CA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 172.20.21.0/24
+      VpcId:
+        Ref: TheVPC92636AB0
+      AvailabilityZone:
+        Fn::Select:
+          - 1
+          - Fn::GetAZs: ""
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: aws-cdk:subnet-name
+          Value: data
+        - Key: aws-cdk:subnet-type
+          Value: Isolated
+        - Key: Name
+          Value: VpcStack/TheVPC/dataSubnet2
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/dataSubnet2/Subnet
+  TheVPCdataSubnet2RouteTableBD466A8B:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId:
+        Ref: TheVPC92636AB0
+      Tags:
+        - Key: Name
+          Value: VpcStack/TheVPC/dataSubnet2
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/dataSubnet2/RouteTable
+  TheVPCdataSubnet2RouteTableAssociation4965945A:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId:
+        Ref: TheVPCdataSubnet2RouteTableBD466A8B
+      SubnetId:
+        Ref: TheVPCdataSubnet2SubnetAE4EF5CA
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/dataSubnet2/RouteTableAssociation
+  TheVPCIGWFA25CC08:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: VpcStack/TheVPC
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/IGW
+  TheVPCVPCGWC9B93E30:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId:
+        Ref: TheVPC92636AB0
+      InternetGatewayId:
+        Ref: TheVPCIGWFA25CC08
+    Metadata:
+      aws:cdk:path: VpcStack/TheVPC/VPCGW
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAAE0VQTQvCMAz9Ld5rdaKgN2WI7CJjivcui1g/UmnTiYz9d1u/enovLy+PJJlczOV4sFQPN4TmMurAWJTdjhVcRIXOeAsockOOrQcW+ZGSeqTQaDRrQ72ICQgT2R3uEFuHMhelr68adr4mfI8mVhnPuFf1FZOetJVzBrSKwX9zJOuijLBVvFGMD/UUpdVtoCm4IEYb+M/w2eRbrTjcdbohcd8LMg3Ksxu12Uxm0/CEs9N6aD2xvqGsPvgCArczdyABAAA=
+    Metadata:
+      aws:cdk:path: VpcStack/CDKMetadata/Default
+    Condition: CDKMetadataAvailable
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - af-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-2
+

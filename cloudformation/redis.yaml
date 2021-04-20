@@ -14,12 +14,16 @@ Parameters:
     Description: Node instance type
     Type: String
     Default: cache.t2.micro
-  SecurityGroupIds:
-    Description: Security group ids for redis
-    Type: "List<AWS::EC2::SecurityGroup::Id>"
   SubnetIds:
-    Description: Subnet ids for redis
+    Description: Subnet ids for redis (when you use the vpc template in this repo, then use the 3x TheVPCdataSubnets)
     Type: "List<AWS::EC2::Subnet::Id>"
+  VpcId:
+    Description: Insert your existing VPC id here
+    Type: String
+  CidrIp:
+    Description: Insert the VPC cidr range (when you use the vpc template you can leave the default)
+    Type: String
+    Default: 172.20.16.0/20
 
 Resources:
   CacheSubnetGroupName:
@@ -37,7 +41,8 @@ Resources:
       Engine: redis
       EngineVersion: !Ref EngineVersion
       NumCacheNodes: 1
-      VpcSecurityGroupIds: !Ref SecurityGroupIds
+      VpcSecurityGroupIds:
+        - !Ref RedisSecurityGroup
 
   DBParameterGroupObject:
     Type: AWS::ElastiCache::ParameterGroup
@@ -46,3 +51,14 @@ Resources:
       CacheParameterGroupFamily: !Ref CacheParameterGroupFamily
       Properties:
         stream-node-max-bytes: "2048"
+
+  RedisSecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupDescription: !Ref "AWS::StackName"
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 6379
+          ToPort: 6379
+          CidrIp: !Ref CidrIp
